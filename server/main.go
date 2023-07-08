@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -10,6 +11,8 @@ import (
 	"os/signal"
 	"syscall"
 )
+
+var Data [][]string
 
 func main() {
 	http.HandleFunc("/", handler)
@@ -39,7 +42,12 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "coolio")
 	case http.MethodPost:
 		buf, _ := io.ReadAll(r.Body)
-		str := string(buf)
-		fmt.Printf("new connection from %v: %v\n", r.RemoteAddr, str)
+		err := json.Unmarshal(buf, &Data)
+		if err != nil {
+			fmt.Printf("error: %v\n", err)
+			return
+		}
+
+		fmt.Printf("new connection from %v: %v\n", r.RemoteAddr, Data[0][0])
 	}
 }
