@@ -14,9 +14,9 @@ import (
 func main() {
 	http.HandleFunc("/", handler)
 
-	l, err := net.Listen("tcp", ":1337")
+	l, err := net.Listen("tcp", ":13370")
 	if err != nil {
-		log.Fatalf("ERROR couldn't listen on port 1337: %v", err)
+		log.Fatalf("ERROR couldn't listen on port 13370: %v", err)
 	}
 	defer l.Close()
 
