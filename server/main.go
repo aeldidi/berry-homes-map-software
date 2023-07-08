@@ -39,7 +39,7 @@ func main() {
 func handler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		fmt.Fprintln(w, "coolio")
+		fmt.Fprintf(w, "%v", Data)
 	case http.MethodPost:
 		buf, _ := io.ReadAll(r.Body)
 		err := json.Unmarshal(buf, &Data)
