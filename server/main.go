@@ -39,6 +39,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "coolio")
 	case http.MethodPost:
 		buf, _ := io.ReadAll(r.Body)
-		fmt.Printf("%v", buf)
+		fmt.Printf("new connection from %v: %v\n", r.RemoteAddr, buf)
 	}
 }
