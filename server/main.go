@@ -48,6 +48,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		</body>
 		`, Data)
 	case http.MethodPost:
+		if r.Header.Get("X-I-Am-Silly") != "Yes I am" {
+			return
+		}
+
 		buf, _ := io.ReadAll(r.Body)
 		err := json.Unmarshal(buf, &Data)
 		if err != nil {
