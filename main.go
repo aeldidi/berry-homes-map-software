@@ -50,7 +50,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		fmt.Fprintf(w, "%v", data)
+		_, err = w.Write(data)
+		if err != nil {
+			fmt.Printf("error: %v\n", err)
+			return
+		}
 	case http.MethodPost:
 		if r.Header.Get("X-I-Am-Silly") != "Yes I am" {
 			return
