@@ -1,16 +1,20 @@
 Google Sheet
 ------------
 
-Sends to the server on each edit:
+Send the spreadsheet to the server
 
-{
-        (Block, Number): [C, D, E, F, G, H],
-}
+```json
+[["Logger"], []]
+```
 
 Server
 ------
 
-http://server => { (Block, Number): status }
+http://server => { Number: status }
+
+We number all the houses from 1 to whatever
+
+so block 1 house 1 = 1, block 1 house 2 = 2, etc
 
 Website
 -------

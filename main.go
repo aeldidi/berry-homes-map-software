@@ -9,15 +9,21 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sort"
 	"syscall"
-
-	_ "embed"
 )
 
-var Data [][]string
+type SheetData = struct {
+	Lot        int
+	Block      int
+	Address    string
+	PocketSize int
+	Notes      string
+	Closing    string
+	Color      string
+}
 
-//go:embed static/index.html
-var Website string
+var Data map[int]string
 
 func main() {
 	http.HandleFunc("/", handler)
@@ -41,16 +47,51 @@ func main() {
 	log.Printf("INFO caught signal %s: shutting down.", sig)
 }
 
+func convert(data []SheetData) map[int]string {
+	sort.Slice(data, func(i, j int) bool {
+		// first the lot number, then the block number
+		a := data[i]
+		b := data[j]
+
+		if a.Lot == b.Lot {
+			return a.Block < b.Block
+		}
+
+		return a.Lot < b.Lot
+	})
+
+	result := make(map[int]string, len(data))
+	for i := 0; i < len(data); i += 1 {
+		if data[i].Notes != "SOLD" {
+			continue
+		}
+
+		result[i] = "SOLD"
+	}
+
+	return result
+}
+
 func handler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
+		w.Header().Set("Content-Type", "application/json")
+
+		// FIXME: we should save the data into a file and read it out
+		//        here that way if the server needs to be restarted,
+		//        you don't have to re-edit the spreadsheet for it to
+		//        work.
+		if Data == nil {
+			w.Write([]byte("[]"))
+			return
+		}
+
 		data, err := json.Marshal(Data)
 		if err != nil {
 			fmt.Printf("error: %v\n", err)
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
 		_, err = w.Write(data)
 		if err != nil {
 			fmt.Printf("error: %v\n", err)
@@ -62,12 +103,30 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		buf, _ := io.ReadAll(r.Body)
-		err := json.Unmarshal(buf, &Data)
+
+		// FIXME: If the body only has 2 lines and the end of the
+		//        second line is a newline, this will crash.
+		number_lines := 0
+		for i := 0; i < len(buf); i += 1 {
+			if number_lines == 2 {
+				break
+			}
+
+			if buf[i] == byte('\n') {
+				number_lines += 1
+				buf = buf[i+1:]
+			}
+		}
+
+		data := make([]SheetData, 115)
+		err := json.Unmarshal(buf, &data)
 		if err != nil {
 			fmt.Printf("error: %v\n", err)
 			return
 		}
 
-		fmt.Printf("new connection from %v: %v\n", r.RemoteAddr, Data[0][0])
+		Data = convert(data)
+
+		fmt.Printf("new connection from %v\n", r.RemoteAddr)
 	}
 }
