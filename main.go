@@ -127,8 +127,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		data = data[2:]
-		Data = convert(data)
+		Data = convert(data[2:])
 
 		fmt.Printf("new connection from %v\n", r.RemoteAddr)
 	}
