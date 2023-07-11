@@ -53,7 +53,7 @@ func convert(data [][]string) map[int]string {
 		sdata := SheetData{
 			Lot:    lot,
 			Block:  block,
-			Status: thing[4],
+			Status: thing[5],
 		}
 
 		fixed_data = append(fixed_data, sdata)
@@ -118,7 +118,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		Data = convert(data[2:])
+		Data = convert(data)
 
 		fmt.Printf("new connection from %v\n", r.RemoteAddr)
 	}
