@@ -48,12 +48,11 @@ func main() {
 func convert(data [][]any) map[int]string {
 	fixed_data := make([]SheetData, len(data))
 	for _, thing := range data {
-		// fmt.Printf("%v\n", thing[0])
 		sdata := SheetData{
-			Lot:        thing[0].(int),
-			Block:      thing[1].(int),
+			Lot:        int(thing[0].(float64)),
+			Block:      int(thing[1].(float64)),
 			Address:    thing[2].(string),
-			PocketSize: thing[3].(int),
+			PocketSize: int(thing[3].(float64)),
 		}
 
 		switch thing[4].(type) {
