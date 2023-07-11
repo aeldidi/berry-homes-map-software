@@ -48,7 +48,7 @@ func main() {
 func convert(data [][]any) map[int]string {
 	fixed_data := make([]SheetData, len(data))
 	for _, thing := range data {
-		fmt.Printf("%v\n", thing)
+		// fmt.Printf("%v\n", thing[0])
 		sdata := SheetData{
 			Lot:        thing[0].(int),
 			Block:      thing[1].(int),
@@ -126,12 +126,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		number_lines := 0
 		for i := 0; i < len(buf); i += 1 {
 			if number_lines == 2 {
+				buf = buf[i:]
+				fmt.Println("bruh")
 				break
 			}
 
 			if buf[i] == byte('\n') {
 				number_lines += 1
-				buf = buf[i+1:]
 			}
 		}
 
