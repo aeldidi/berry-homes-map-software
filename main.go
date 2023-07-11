@@ -48,7 +48,7 @@ func main() {
 func convert(data [][]any) map[int]string {
 	fixed_data := make([]SheetData, len(data))
 	for _, thing := range data {
-		fmt.Printf("%v", thing)
+		fmt.Printf("%v\n", thing)
 		sdata := SheetData{
 			Lot:        thing[0].(int),
 			Block:      thing[1].(int),
