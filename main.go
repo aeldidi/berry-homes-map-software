@@ -10,9 +10,14 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+
+	_ "embed"
 )
 
 var Data [][]string
+
+//go:embed static/index.html
+var Website string
 
 func main() {
 	http.HandleFunc("/", handler)
@@ -39,14 +44,13 @@ func main() {
 func handler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		fmt.Fprintf(w, `
-		<!DOCTYPE html>
-		<head>
-		</head>
-		<body>
-			<code>%v</code>
-		</body>
-		`, Data)
+		data, err := json.Marshal(Data)
+		if err != nil {
+			fmt.Printf("error: %v\n", err)
+			return
+		}
+
+		fmt.Fprintf(w, "%v", data)
 	case http.MethodPost:
 		if r.Header.Get("X-I-Am-Silly") != "Yes I am" {
 			return
