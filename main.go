@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"sort"
+	"strconv"
 	"syscall"
 )
 
@@ -43,17 +44,16 @@ func main() {
 	log.Printf("INFO caught signal %s: shutting down.", sig)
 }
 
-func convert(data [][]any) map[int]string {
+func convert(data [][]string) map[int]string {
 	fixed_data := make([]SheetData, len(data))
 	for _, thing := range data {
-		sdata := SheetData{
-			Lot:   int(thing[0].(float64)),
-			Block: int(thing[1].(float64)),
-		}
+		lot, _ := strconv.Atoi(thing[0])
+		block, _ := strconv.Atoi(thing[1])
 
-		switch thing[4].(type) {
-		case string:
-			sdata.Status = thing[4].(string)
+		sdata := SheetData{
+			Lot:    lot,
+			Block:  block,
+			Status: thing[4],
 		}
 
 		if sdata.Status != "SOLD" {
@@ -115,7 +115,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		buf, _ := io.ReadAll(r.Body)
-		data := make([][]any, 115)
+		data := make([][]string, 115)
 		err := json.Unmarshal(buf, &data)
 		if err != nil {
 			fmt.Printf("error: %v\n", err)
