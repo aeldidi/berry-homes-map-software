@@ -120,23 +120,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		buf, _ := io.ReadAll(r.Body)
-
-		// FIXME: If the body only has 2 lines and the end of the
-		//        second line is a newline, this will crash.
-		number_lines := 0
-		for i := 0; i < len(buf); i += 1 {
-			if number_lines == 2 {
-				buf = buf[i:]
-				fmt.Println("bruh")
-				break
-			}
-
-			if buf[i] == byte('\n') {
-				number_lines += 1
-			}
-		}
-
 		data := make([][]any, 115)
+		data = data[2:]
 		err := json.Unmarshal(buf, &data)
 		if err != nil {
 			fmt.Printf("error: %v\n", err)
