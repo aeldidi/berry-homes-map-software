@@ -37,7 +37,6 @@ func main() {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("bruh")
 	switch r.Method {
 	case http.MethodGet:
 		fmt.Fprintf(w, `
@@ -49,11 +48,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		</body>
 		`, Data)
 	case http.MethodPost:
-		fmt.Println("bruh2")
 		if r.Header.Get("X-I-Am-Silly") != "Yes I am" {
 			return
 		}
-		fmt.Println("bruh3")
 
 		buf, _ := io.ReadAll(r.Body)
 		err := json.Unmarshal(buf, &Data)
