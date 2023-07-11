@@ -50,6 +50,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		w.Header().Set("Content-Type", "application/json")
 		_, err = w.Write(data)
 		if err != nil {
 			fmt.Printf("error: %v\n", err)
