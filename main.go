@@ -57,12 +57,11 @@ func convert(data [][]any) map[int]string {
 
 		switch thing[4].(type) {
 		case string:
-			if thing[4].(string) != "SOLD" {
-				sdata.Status = ""
-				break
-			}
+			sdata.Status = thing[4].(string)
+		}
 
-			sdata.Status = "SOLD"
+		if sdata.Status != "SOLD" {
+			sdata.Status = ""
 		}
 
 		fixed_data = append(fixed_data, sdata)
