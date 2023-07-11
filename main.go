@@ -121,13 +121,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 		buf, _ := io.ReadAll(r.Body)
 		data := make([][]any, 115)
-		data = data[2:]
 		err := json.Unmarshal(buf, &data)
 		if err != nil {
 			fmt.Printf("error: %v\n", err)
 			return
 		}
 
+		data = data[2:]
 		Data = convert(data)
 
 		fmt.Printf("new connection from %v\n", r.RemoteAddr)
