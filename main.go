@@ -18,9 +18,7 @@ type SheetData = struct {
 	Block      int
 	Address    string
 	PocketSize int
-	Notes      string
-	Closing    string
-	Color      string
+	Status     string
 }
 
 var Data map[int]string
@@ -47,11 +45,33 @@ func main() {
 	log.Printf("INFO caught signal %s: shutting down.", sig)
 }
 
-func convert(data []SheetData) map[int]string {
-	sort.Slice(data, func(i, j int) bool {
+func convert(data [][]any) map[int]string {
+	fixed_data := make([]SheetData, len(data))
+	for _, thing := range data {
+		sdata := SheetData{
+			Lot:        thing[0].(int),
+			Block:      thing[1].(int),
+			Address:    thing[2].(string),
+			PocketSize: thing[3].(int),
+		}
+
+		switch thing[4].(type) {
+		case string:
+			if thing[4].(string) != "SOLD" {
+				sdata.Status = ""
+				break
+			}
+
+			sdata.Status = "SOLD"
+		}
+
+		fixed_data = append(fixed_data)
+	}
+
+	sort.Slice(fixed_data, func(i, j int) bool {
 		// first the lot number, then the block number
-		a := data[i]
-		b := data[j]
+		a := fixed_data[i]
+		b := fixed_data[j]
 
 		if a.Lot == b.Lot {
 			return a.Block < b.Block
@@ -60,13 +80,9 @@ func convert(data []SheetData) map[int]string {
 		return a.Lot < b.Lot
 	})
 
-	result := make(map[int]string, len(data))
-	for i := 0; i < len(data); i += 1 {
-		if data[i].Notes != "SOLD" {
-			continue
-		}
-
-		result[i] = "SOLD"
+	result := make(map[int]string, len(fixed_data))
+	for i := 0; i < len(fixed_data); i += 1 {
+		result[i] = fixed_data[i].Status
 	}
 
 	return result
@@ -118,7 +134,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		data := make([]SheetData, 115)
+		data := make([][]any, 115)
 		err := json.Unmarshal(buf, &data)
 		if err != nil {
 			fmt.Printf("error: %v\n", err)
