@@ -74,7 +74,6 @@ func convert(data [][]string) map[int]string {
 
 		return a.Lot < b.Lot
 	})
-	fmt.Printf("%#v\n", fixed_data)
 
 	result := make(map[int]string, len(fixed_data))
 	for i := 0; i < len(fixed_data); i += 1 {
