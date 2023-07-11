@@ -14,11 +14,9 @@ import (
 )
 
 type SheetData = struct {
-	Lot        int
-	Block      int
-	Address    string
-	PocketSize int
-	Status     string
+	Lot    int
+	Block  int
+	Status string
 }
 
 var Data map[int]string
@@ -49,10 +47,8 @@ func convert(data [][]any) map[int]string {
 	fixed_data := make([]SheetData, len(data))
 	for _, thing := range data {
 		sdata := SheetData{
-			Lot:        int(thing[0].(float64)),
-			Block:      int(thing[1].(float64)),
-			Address:    thing[2].(string),
-			PocketSize: int(thing[3].(float64)),
+			Lot:   int(thing[0].(float64)),
+			Block: int(thing[1].(float64)),
 		}
 
 		switch thing[4].(type) {
