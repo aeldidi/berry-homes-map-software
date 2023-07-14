@@ -50,17 +50,37 @@
                         [784, 498], [806, 501], [831, 501], [849, 500]
                 ];
 
-                let canvas = null
+                function drawCircle(canvas, x, y, radius) {
+                        canvas.beginPath();
+                        canvas.arc(x, y, radius, 0, 2 * Math.PI, false);
+                        canvas.fillStyle = 'red';
+                        canvas.fill();
+                        canvas.lineWidth = 5;
+                        canvas.strokeStyle = 'red';
+                        canvas.stroke();
+                }
+
                 async function main() {
                         let elem = document.querySelector('#canvas')
                         let img = document.images[0]
-                        canvas = elem.getContext('2d')
+                        let canvas = elem.getContext('2d')
 
                         elem.width = img.width
                         elem.height = img.height
                         canvas.drawImage(document.images[0], 0, 0)
                         let data = await fetch('https://test-sheet.eldidi.org')
-                        console.log(body)
+                        data = await data.json()
+
+                        for (const [key, value] of Object.entries(data)) {
+                                console.log(value)
+                                if (value != 'SOLD') {
+                                        continue
+                                }
+
+                                let num = parseInt(key)
+                                let [x, y] = number_to_point[num]
+                                drawCircle(canvas, x, y, 5)
+                        }
                 }
         </script>
 </head>

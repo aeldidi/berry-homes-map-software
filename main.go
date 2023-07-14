@@ -122,6 +122,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		fmt.Printf("number of things: %v\n", len(data))
+
 		Data = convert(data)
 
 		fmt.Printf("new connection from %v\n", r.RemoteAddr)
