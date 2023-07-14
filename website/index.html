@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <head>
-        <title>Bruh</title>
+        <title>Real Estate Map Demo</title>
 
         <style>
                 .hidden {
@@ -68,7 +68,7 @@
                         elem.width = img.width
                         elem.height = img.height
                         canvas.drawImage(document.images[0], 0, 0)
-                        let data = await fetch('https://test-sheet.eldidi.org')
+                        let data = await fetch('https://test-sheet.eldidi.org/api')
                         data = await data.json()
 
                         for (const [key, value] of Object.entries(data)) {
