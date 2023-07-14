@@ -1,5 +1,5 @@
-Google Sheet
-------------
+Google Sheet (DONE)
+-------------------
 
 Send the spreadsheet to the server
 
@@ -7,8 +7,8 @@ Send the spreadsheet to the server
 [["Logger"], []]
 ```
 
-Server
-------
+Server (DONE)
+-------------
 
 http://server => { Number: status }
 
@@ -19,4 +19,8 @@ so block 1 house 1 = 1, block 1 house 2 = 2, etc
 Website
 -------
 
-For each house: check server and draw the thing
+[ ] Get the positions of all the houses and make an object which goes
+    Number => (x, y) on image
+
+[ ] fetch() the data, loop through each one and draw a circle on the canvas if
+            the point associated with that number is sold.

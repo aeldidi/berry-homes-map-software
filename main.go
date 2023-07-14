@@ -109,6 +109,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	case http.MethodPost:
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		if r.Header.Get("X-I-Am-Silly") != "Yes I am" {
 			return
 		}

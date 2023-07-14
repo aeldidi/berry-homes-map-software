@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+
+<head>
+        <title>Silly</title>
+
+        <style>
+                html {
+                        overflow: hidden;
+                        margin: 0;
+                        padding: 0;
+                }
+
+                .hidden {
+                        display: none
+                }
+        </style>
+
+        <script>
+                window.onload = main
+
+                let coords = new Array()
+                let canvas_element = null
+                let button = null
+                let results = null
+
+                function drawCircle(canvas, x, y, radius) {
+                        canvas.beginPath();
+                        canvas.arc(x, y, radius, 0, 2 * Math.PI, false);
+                        canvas.fillStyle = 'red';
+                        canvas.fill();
+                        canvas.lineWidth = 5;
+                        canvas.strokeStyle = 'red';
+                        canvas.stroke();
+                }
+
+                async function main() {
+                        button = document.querySelector('#see_results')
+                        results = document.querySelector('#results')
+                        canvas_element = document.querySelector('#canvas')
+
+                        if (!canvas_element.getContext) {
+                                results.innerHTML = `
+                                        <h1>Error</h1>
+                                `
+                                return
+                        }
+
+                        let img = document.images[0]
+                        canvas_element.width = img.width
+                        canvas_element.height = img.height
+
+                        let canvas = canvas_element.getContext('2d')
+                        canvas.drawImage(img, 0, 0)
+                        canvas_element.addEventListener('click', (e) => {
+                                const rect = canvas_element.getBoundingClientRect()
+                                let x = event.clientX - rect.left
+                                let y = event.clientY - rect.top
+
+                                drawCircle(canvas, x, y, 5)
+                                coords.push([x, y])
+                        })
+
+                        button.onclick = function () {
+                                let str = coords.map(arr => `[${arr.join(', ')}]`)
+
+                                results.innerHTML = `
+                                        <code>[${str}]</code>
+                                `
+                        }
+                }
+        </script>
+</head>
+
+<body>
+        <img class="hidden" src="/Churchill_Meadows.png" />
+        <canvas id="canvas"></canvas>
+        <button id="see_results">See results</button>
+        <div id="results"></div>
+</body>
