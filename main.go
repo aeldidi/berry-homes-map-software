@@ -45,7 +45,7 @@ func main() {
 }
 
 func convert(data [][]string) map[int]string {
-	fixed_data := make([]SheetData, len(data))
+	fixed_data := make([]SheetData, 0)
 	for _, thing := range data {
 		lot, _ := strconv.Atoi(thing[0])
 		block, _ := strconv.Atoi(thing[1])
