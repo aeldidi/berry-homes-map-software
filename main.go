@@ -87,6 +87,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 
 		// FIXME: we should save the data into a file and read it out
 		//        here that way if the server needs to be restarted,
@@ -109,7 +110,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	case http.MethodPost:
-		w.Header().Set("Access-Control-Allow-Origin", "*")
 		if r.Header.Get("X-I-Am-Silly") != "Yes I am" {
 			return
 		}
