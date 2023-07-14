@@ -68,11 +68,11 @@ func convert(data [][]string) map[int]string {
 		a := fixed_data[i]
 		b := fixed_data[j]
 
-		if a.Lot == b.Lot {
-			return a.Block < b.Block
+		if a.Block == b.Block {
+			return a.Lot < b.Lot
 		}
 
-		return a.Lot < b.Lot
+		return a.Block < b.Block
 	})
 
 	result := make(map[int]string, len(fixed_data))
