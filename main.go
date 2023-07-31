@@ -225,7 +225,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			point := Points[k]
 			center := canvas.Identity.
 				Translate(point.X, point.Y).
-				ReflectYAbout(float64(Image.Bounds().Dy()) / 2)
+				ReflectY()
 
 			// draw the circle at the point
 			c.RenderPath(canvas.Circle(5), style, center)
