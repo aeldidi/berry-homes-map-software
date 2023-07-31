@@ -209,11 +209,12 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("new connection from %v\n", r.RemoteAddr)
 		Data = convert(data)
 
-		style := canvas.Style{
-			Fill: canvas.Paint{
-				Color: canvas.Hex("#FF0000"),
-			},
-		}
+		style := canvas.DefaultStyle
+		// style := canvas.Style{
+		// 	Fill: canvas.Paint{
+		// 		Color: canvas.Hex("#ff0000"),
+		// 	},
+		// }
 		c := canvas.New(float64(Image.Bounds().Dx()),
 			float64(Image.Bounds().Dy()))
 		c.RenderImage(Image.Image, canvas.Identity)
