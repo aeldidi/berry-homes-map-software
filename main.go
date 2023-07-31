@@ -223,8 +223,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			point := Points[k]
-			center := canvas.Identity.Translate(point.X, point.Y).
-				ReflectY()
+			center := canvas.Identity.
+				Translate(point.X, point.Y).
+				ReflectYAbout(float64(Image.Bounds().Dy()) / 2)
 
 			// draw the circle at the point
 			c.RenderPath(canvas.Circle(5), style, center)
@@ -245,7 +246,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			}
 		}()
 
-		w.WriteHeader(200)
 		bbuf := &bytes.Buffer{}
 		err = png.Encode(io.MultiWriter(f, bbuf), result)
 		if err != nil {
@@ -260,5 +260,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			// TODO: write error response here
 			return
 		}
+		w.WriteHeader(200)
 	}
 }
