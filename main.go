@@ -209,27 +209,23 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("new connection from %v\n", r.RemoteAddr)
 		Data = convert(data)
 
-		style := canvas.Style{
-			Fill: canvas.Paint{
-				Color: canvas.Hex("#ff0000"),
-			},
-		}
-		c := canvas.New(float64(Image.Bounds().Dx()),
+		cvs := canvas.New(float64(Image.Bounds().Dx()),
 			float64(Image.Bounds().Dy()))
-		c.RenderImage(Image.Image, canvas.Identity)
+		c := canvas.NewContext(cvs)
+		c.DrawImage(0, 0, Image.Image, canvas.DefaultResolution)
+		c.SetFillColor(canvas.Hex("#ff0000"))
 		for k, v := range Data {
 			if v != "SOLD" {
 				continue
 			}
 
 			point := Points[k]
-			center := canvas.Identity.Translate(point.X, point.Y)
 
 			// draw the circle at the point
-			c.RenderPath(canvas.Circle(5), style, center)
+			c.DrawPath(point.X, point.Y, canvas.Circle(5))
 		}
 
-		result := rasterizer.Draw(c, canvas.DefaultResolution,
+		result := rasterizer.Draw(cvs, canvas.DefaultResolution,
 			canvas.SRGBColorSpace{})
 		// Save the previous image
 		f, err := os.Create(PreviousPath)
