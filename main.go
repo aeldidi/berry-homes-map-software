@@ -260,6 +260,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			// TODO: write error response here
 			return
 		}
+		log.Println("new thing should be ready")
 		w.WriteHeader(200)
 	}
 }
