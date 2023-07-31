@@ -187,22 +187,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 
-		// FIXME: we should save the data into a file and read it out
-		//        here that way if the server needs to be restarted,
-		//        you don't have to re-edit the spreadsheet for it to
-		//        work.
-		if Data == nil {
-			w.Write([]byte("[]"))
-			return
-		}
-
-		data, err := json.Marshal(Data)
-		if err != nil {
-			fmt.Printf("error: %v\n", err)
-			return
-		}
-
-		_, err = w.Write(data)
+		_, err := w.Write(Image.Bytes)
 		if err != nil {
 			fmt.Printf("error: %v\n", err)
 			return
