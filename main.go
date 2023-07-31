@@ -214,9 +214,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				Color: canvas.Hex("#ff0000"),
 			},
 		}
-		cvs := canvas.New(float64(Image.Bounds().Dx()),
+		c := canvas.New(float64(Image.Bounds().Dx()),
 			float64(Image.Bounds().Dy()))
-		c := canvas.NewContext(cvs)
 		c.RenderImage(Image.Image, canvas.Identity)
 		for k, v := range Data {
 			if v != "SOLD" {
