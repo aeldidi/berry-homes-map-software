@@ -28,8 +28,6 @@ type SheetData struct {
 	Status string
 }
 
-var Data map[int]string
-
 // There are 112 numbers
 var Points = []canvas.Point{
 	// First block
@@ -207,60 +205,63 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		log.Printf("new connection from %v\n", r.RemoteAddr)
-		Data = convert(data)
-
-		style := canvas.Style{
-			Fill: canvas.Paint{
-				Color: canvas.Hex("#ff0000"),
-			},
-		}
-		c := canvas.New(float64(Image.Bounds().Dx()),
-			float64(Image.Bounds().Dy()))
-		c.RenderImage(Image.Image, canvas.Identity)
-		for k, v := range Data {
-			if v != "SOLD" {
-				continue
-			}
-
-			point := Points[k]
-			center := canvas.Identity.
-				Translate(point.X, point.Y).
-				ReflectX()
-
-			// draw the circle at the point
-			c.RenderPath(canvas.Circle(5), style, center)
-		}
-
-		result := rasterizer.Draw(c, canvas.DefaultResolution,
-			canvas.SRGBColorSpace{})
-		// Save the previous image
-		f, err := os.Create(PreviousPath)
-		if err != nil {
-			log.Printf("couldn't open file: %v\n", err)
-			return
-		}
-		defer func() {
-			err := f.Close()
-			if err != nil {
-				log.Printf("couldn't write file: %v\n", err)
-			}
-		}()
-
-		bbuf := &bytes.Buffer{}
-		err = png.Encode(io.MultiWriter(f, bbuf), result)
-		if err != nil {
-			log.Printf("couldn't encode image: %v\n", err)
-			// TODO: write error response here
-			return
-		}
-
-		Previous, err = canvas.NewPNGImage(bytes.NewReader(bbuf.Bytes()))
-		if err != nil {
-			log.Printf("couldn't encode image: %v\n", err)
-			// TODO: write error response here
-			return
-		}
-		log.Println("new thing should be ready")
+		new_data := convert(data)
+		go generateImage(new_data)
 		w.WriteHeader(200)
 	}
+}
+
+func generateImage(data map[int]string) {
+	style := canvas.Style{
+		Fill: canvas.Paint{
+			Color: canvas.Hex("#ff0000"),
+		},
+	}
+	c := canvas.New(float64(Image.Bounds().Dx()),
+		float64(Image.Bounds().Dy()))
+	c.RenderImage(Image.Image, canvas.Identity)
+	for k, v := range data {
+		if v != "SOLD" {
+			continue
+		}
+
+		point := Points[k]
+		center := canvas.Identity.
+			Translate(point.X, point.Y).
+			ReflectX()
+
+		// draw the circle at the point
+		c.RenderPath(canvas.Circle(5), style, center)
+	}
+
+	result := rasterizer.Draw(c, canvas.DefaultResolution,
+		canvas.SRGBColorSpace{})
+	// Save the previous image
+	f, err := os.Create(PreviousPath)
+	if err != nil {
+		log.Printf("couldn't open file: %v\n", err)
+		return
+	}
+	defer func() {
+		err := f.Close()
+		if err != nil {
+			log.Printf("couldn't write file: %v\n", err)
+		}
+	}()
+
+	bbuf := &bytes.Buffer{}
+	err = png.Encode(io.MultiWriter(f, bbuf), result)
+	if err != nil {
+		log.Printf("couldn't encode image: %v\n", err)
+		// TODO: write error response here
+		return
+	}
+
+	Previous, err = canvas.NewPNGImage(bytes.NewReader(bbuf.Bytes()))
+	if err != nil {
+		log.Printf("couldn't encode image: %v\n", err)
+		// TODO: write error response here
+		return
+	}
+	log.Println("new thing should be ready")
 }
