@@ -188,7 +188,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Cache-Control", "no-cache")
 
-		_, err := w.Write(Image.Bytes)
+		_, err := w.Write(Previous.Bytes)
 		if err != nil {
 			fmt.Printf("error: %v\n", err)
 			return
@@ -209,12 +209,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("new connection from %v\n", r.RemoteAddr)
 		Data = convert(data)
 
-		style := canvas.DefaultStyle
-		// style := canvas.Style{
-		// 	Fill: canvas.Paint{
-		// 		Color: canvas.Hex("#ff0000"),
-		// 	},
-		// }
+		style := canvas.Style{
+			Fill: canvas.Paint{
+				Color: canvas.Hex("#ff0000"),
+			},
+		}
 		c := canvas.New(float64(Image.Bounds().Dx()),
 			float64(Image.Bounds().Dy()))
 		c.RenderImage(Image.Image, canvas.Identity)
@@ -245,7 +244,16 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			}
 		}()
 
-		err = png.Encode(io.MultiWriter(f, w), result)
+		w.WriteHeader(200)
+		bbuf := &bytes.Buffer{}
+		err = png.Encode(io.MultiWriter(f, bbuf), result)
+		if err != nil {
+			fmt.Printf("couldn't encode image: %v\n", err)
+			// TODO: write error response here
+			return
+		}
+
+		Previous, err = canvas.NewPNGImage(bytes.NewReader(bbuf.Bytes()))
 		if err != nil {
 			fmt.Printf("couldn't encode image: %v\n", err)
 			// TODO: write error response here
