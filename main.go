@@ -219,7 +219,7 @@ func generateImage(data map[int]string) {
 	}
 	yellow_style := canvas.Style{
 		Fill: canvas.Paint{
-			Color: canvas.Hex("#ebdb52"),
+			Color: canvas.Hex("#fffb00"),
 		},
 	}
 	c := canvas.New(float64(Image.Bounds().Dx()),
