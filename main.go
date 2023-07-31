@@ -184,8 +184,9 @@ func convert(data [][]string) map[int]string {
 func handler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Content-Type", "image/png")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Cache-Control", "no-cache")
 
 		_, err := w.Write(Image.Bytes)
 		if err != nil {
