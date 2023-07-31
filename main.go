@@ -228,7 +228,7 @@ func generateImage(data map[int]string) {
 		point := Points[k]
 		center := canvas.Identity.
 			Translate(point.X, point.Y).
-			ReflectX()
+			ReflectY()
 
 		// draw the circle at the point
 		c.RenderPath(canvas.Circle(5), style, center)
