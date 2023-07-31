@@ -232,7 +232,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		result := rasterizer.Draw(c, canvas.DefaultResolution,
 			canvas.SRGBColorSpace{})
 		// Save the previous image
-		f, err := os.Open(PreviousPath)
+		f, err := os.Create(PreviousPath)
 		if err != nil {
 			log.Printf("couldn't open file: %v\n", err)
 			return
