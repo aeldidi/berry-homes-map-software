@@ -206,7 +206,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		fmt.Printf("new connection from %v\n", r.RemoteAddr)
+		log.Printf("new connection from %v\n", r.RemoteAddr)
 		Data = convert(data)
 
 		style := canvas.Style{
@@ -234,13 +234,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		// Save the previous image
 		f, err := os.Open(PreviousPath)
 		if err != nil {
-			fmt.Printf("couldn't open file: %v\n", err)
+			log.Printf("couldn't open file: %v\n", err)
 			return
 		}
 		defer func() {
 			err := f.Close()
 			if err != nil {
-				fmt.Printf("couldn't write file: %v\n", err)
+				log.Printf("couldn't write file: %v\n", err)
 			}
 		}()
 
@@ -248,14 +248,14 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		bbuf := &bytes.Buffer{}
 		err = png.Encode(io.MultiWriter(f, bbuf), result)
 		if err != nil {
-			fmt.Printf("couldn't encode image: %v\n", err)
+			log.Printf("couldn't encode image: %v\n", err)
 			// TODO: write error response here
 			return
 		}
 
 		Previous, err = canvas.NewPNGImage(bytes.NewReader(bbuf.Bytes()))
 		if err != nil {
-			fmt.Printf("couldn't encode image: %v\n", err)
+			log.Printf("couldn't encode image: %v\n", err)
 			// TODO: write error response here
 			return
 		}
