@@ -152,7 +152,7 @@ func convert(data [][]string) map[int]string {
 			Status: thing[5],
 		}
 
-		if sdata.Status != "SOLD" {
+		if sdata.Status != "SOLD" && sdata.Status != "PENDING" {
 			sdata.Status = ""
 		}
 
@@ -212,25 +212,29 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func generateImage(data map[int]string) {
-	style := canvas.Style{
+	red_style := canvas.Style{
 		Fill: canvas.Paint{
 			Color: canvas.Hex("#ff0000"),
+		},
+	}
+	yellow_style := canvas.Style{
+		Fill: canvas.Paint{
+			Color: canvas.Hex("#ebdb52"),
 		},
 	}
 	c := canvas.New(float64(Image.Bounds().Dx()),
 		float64(Image.Bounds().Dy()))
 	c.RenderImage(Image.Image, canvas.Identity)
 	for k, v := range data {
-		if v != "SOLD" {
-			continue
-		}
-
 		point := Points[k]
 		center := canvas.Identity.Translate(point.X,
 			float64(Image.Bounds().Dy())-point.Y)
-
-		// draw the circle at the point
-		c.RenderPath(canvas.Circle(5), style, center)
+		switch v {
+		case "SOLD":
+			c.RenderPath(canvas.Circle(7), red_style, center)
+		case "PENDING":
+			c.RenderPath(canvas.Circle(7), yellow_style, center)
+		}
 	}
 
 	result := rasterizer.Draw(c, canvas.DefaultResolution,
