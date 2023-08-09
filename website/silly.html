@@ -51,20 +51,20 @@
 
                         let canvas = canvas_element.getContext('2d')
                         canvas.drawImage(img, 0, 0)
-                        canvas_element.addEventListener('click', (e) => {
+                        canvas_element.addEventListener('click', e => {
                                 const rect = canvas_element.getBoundingClientRect()
                                 let x = event.clientX - rect.left
                                 let y = event.clientY - rect.top
 
                                 drawCircle(canvas, x, y, 5)
-                                coords.push([x, y])
+                                coords.push({ 'X': x, 'Y': y })
                         })
 
                         button.onclick = function () {
-                                let str = coords.map(arr => `[${arr.join(', ')}]`)
+                                let str = coords.map($ => `{X: ${$.X}, Y: ${$.Y}}`)
 
                                 results.innerHTML = `
-                                        <code>[${str}]</code>
+                                        <code>[]canvas.Point{${str.join(',')}}</code>
                                 `
                         }
                 }
@@ -72,7 +72,7 @@
 </head>
 
 <body>
-        <img class="hidden" src="/Churchill_Meadows.png" />
+        <img class="hidden" src="/Irvine_Creek.png" />
         <canvas id="canvas"></canvas>
         <button id="see_results">See results</button>
         <div id="results"></div>
