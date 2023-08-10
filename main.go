@@ -118,7 +118,7 @@ var ChurchillMeadowsPoints = []canvas.Point{
 //go:embed website/Churchill_Meadows.png
 var Churchill_Meadows []byte
 
-// go:embed website/Irvine_Creek.png
+//go:embed website/Irvine_Creek.png
 var Irvine_Creek []byte
 
 type Cache struct {
