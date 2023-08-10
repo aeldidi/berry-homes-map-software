@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"image/png"
 	"io"
@@ -11,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path"
 	"sort"
 	"strconv"
 	"strings"
@@ -28,8 +30,46 @@ type SheetData struct {
 	Status string
 }
 
+var IrvineCreekPoints = []canvas.Point{
+	// Block 3
+	{X: 657, Y: 1194}, {X: 679, Y: 1140}, {X: 745, Y: 1081},
+	{X: 772, Y: 1116}, {X: 792, Y: 1145}, {X: 812, Y: 1178},
+	{X: 827, Y: 1208}, {X: 844, Y: 1241}, {X: 860, Y: 1271},
+
+	// Block 4
+	{X: 1016, Y: 1334}, {X: 1053, Y: 1311}, {X: 1084, Y: 1291},
+	{X: 1119, Y: 1268}, {X: 1141, Y: 1254}, {X: 1177, Y: 1231},
+	{X: 1201, Y: 1214}, {X: 1241, Y: 1197}, {X: 1266, Y: 1181},
+	{X: 1302, Y: 1162}, {X: 1331, Y: 1146}, {X: 1407, Y: 1097},
+	{X: 1428, Y: 1132}, {X: 1450, Y: 1163}, {X: 1471, Y: 1187},
+	{X: 1505, Y: 1194}, {X: 1544, Y: 1193}, {X: 1582, Y: 1186},
+	{X: 1604, Y: 1163}, {X: 1613, Y: 1132}, {X: 1611, Y: 1097},
+	{X: 1610, Y: 1059}, {X: 1601, Y: 1025}, {X: 1588, Y: 984},
+
+	// Block 7
+	{X: 1459, Y: 950}, {X: 1434, Y: 913}, {X: 1421, Y: 888},
+	{X: 1399, Y: 849}, {X: 1482, Y: 809}, {X: 1525, Y: 817},
+	{X: 1571, Y: 815}, {X: 1600, Y: 800}, {X: 1614, Y: 772},
+	{X: 1618, Y: 734}, {X: 1602, Y: 711}, {X: 1571, Y: 686},
+	{X: 1535, Y: 687}, {X: 1496, Y: 691}, {X: 1462, Y: 701},
+	{X: 1424, Y: 720}, {X: 1366, Y: 756}, {X: 1326, Y: 779},
+	{X: 1289, Y: 805}, {X: 1281, Y: 846}, {X: 1281, Y: 885},
+	{X: 1302, Y: 912}, {X: 1324, Y: 947}, {X: 1344, Y: 976},
+	{X: 1358, Y: 1009}, {X: 1204, Y: 1095}, {X: 1184, Y: 1067},
+	{X: 1169, Y: 1031}, {X: 1155, Y: 991}, {X: 1134, Y: 963},
+	{X: 1099, Y: 954}, {X: 1057, Y: 963}, {X: 1039, Y: 1000},
+	{X: 1035, Y: 1039}, {X: 1043, Y: 1069}, {X: 1068, Y: 1093},
+	{X: 1095, Y: 1122}, {X: 1110, Y: 1153}, {X: 972, Y: 1234},
+	{X: 952, Y: 1203}, {X: 933, Y: 1174}, {X: 916, Y: 1140},
+	{X: 898, Y: 1112}, {X: 877, Y: 1077}, {X: 860, Y: 1049},
+	{X: 841, Y: 1019}, {X: 812, Y: 965}, {X: 765, Y: 958},
+	{X: 724, Y: 950}, {X: 682, Y: 956}, {X: 649, Y: 986},
+	{X: 635, Y: 1023}, {X: 616, Y: 1074}, {X: 596, Y: 1110},
+	{X: 558, Y: 1150},
+}
+
 // There are 112 numbers
-var Points = []canvas.Point{
+var ChurchillMeadowsPoints = []canvas.Point{
 	// First block
 	{X: 321, Y: 153}, {X: 384, Y: 150}, {X: 445, Y: 149},
 	{X: 500, Y: 152}, {X: 548, Y: 156}, {X: 591, Y: 159},
@@ -76,60 +116,142 @@ var Points = []canvas.Point{
 }
 
 //go:embed website/Churchill_Meadows.png
-var _Image []byte
-var PreviousPath string
-var Previous canvas.Image
-var Image canvas.Image
+var Churchill_Meadows []byte
+
+// go:embed website/Irvine_Creek.png
+var Irvine_Creek []byte
+
+type Cache struct {
+	path string
+	imgs map[string][]byte
+	c    chan struct {
+		name  string
+		bytes []byte
+	}
+}
+
+// Makes a new cache with the specified buffer size
+func NewCache(basepath string, buffer int) Cache {
+	result := Cache{
+		path: basepath,
+		imgs: make(map[string][]byte, buffer),
+		c: make(chan struct {
+			name  string
+			bytes []byte
+		}, buffer),
+	}
+
+	dirs, err := os.ReadDir(result.path)
+	if err != nil {
+		log.Fatalf("couldn't read '%v': %v\n", basepath, err)
+	}
+
+	for _, dir := range dirs {
+		if dir.Type().IsDir() {
+			log.Printf("directory in cache dir: %v", dir.Name())
+			continue
+		}
+
+		buf, err := os.ReadFile(path.Join(basepath, dir.Name()))
+		if err != nil {
+			log.Fatalf("couldn't read file '%v': %v\n", dir.Name(), err)
+		}
+
+		name := strings.TrimSuffix(dir.Name(), ".png")
+		result.imgs[name] = buf
+	}
+
+	return result
+}
+
+func (c *Cache) WriteImage(name string, w io.Writer) (int, error) {
+	return w.Write(c.imgs[name])
+}
+
+func (c *Cache) ListenForUpdates() {
+	for {
+		entry := <-c.c
+		path := path.Join(c.path, fmt.Sprintf(entry.name, ".png"))
+		f, err := os.Create(path)
+		if err != nil {
+			log.Printf("couldn't write '%v' to cache: %v", entry.name, err)
+			continue
+		}
+
+		_, err = f.Write(entry.bytes)
+		if err != nil {
+			log.Printf("couldn't write '%v' to cache: %v", entry.name, err)
+			continue
+		}
+
+		err = f.Close()
+		if err != nil {
+			log.Printf("couldn't write '%v' to cache: %v", entry.name, err)
+			continue
+		}
+	}
+}
+
+func (c *Cache) Set(name string, img []byte) {
+	c.c <- struct {
+		name  string
+		bytes []byte
+	}{name, img}
+
+	c.imgs[name] = img
+}
+
+var CacheDir Cache
 
 func init() {
-	var err error
-
+	var dir string
 	set := false
 	for _, e := range os.Environ() {
 		pair := strings.SplitN(e, "=", 2)
-		if pair[0] != "REAL_ESTATE_MAP_CACHEFILE" {
+		if pair[0] != "REAL_ESTATE_MAP_CACHEDIR" {
 			continue
 		}
 
 		set = true
-		PreviousPath = pair[1]
+		dir = pair[1]
 		break
 	}
 
 	if !set {
-		panic("REAL_ESTATE_MAP_CACHEFILE not set!")
+		log.Fatalln("REAL_ESTATE_MAP_CACHEDIR not set!")
 	}
 
-	Image, err = canvas.NewPNGImage(bytes.NewReader(_Image))
-	if err != nil {
-		panic("couldn't read Churchill_Meadows.png")
+	_, err := os.Stat(dir)
+	if errors.Is(err, os.ErrNotExist) {
+		err = os.Mkdir(dir, os.ModeDir)
+		if err != nil {
+			log.Fatalf("couldn't create directory '%v': %v\n", dir, err)
+		}
+	} else if err != nil {
+		log.Fatalf("couldn't stat directory '%v': %v\n", dir, err)
 	}
 
-	f, err := os.Open(PreviousPath)
-	if err != nil {
-		panic(fmt.Sprintf("couldn't open %v: %v", PreviousPath, err))
-	}
-	defer f.Close()
-
-	Previous, err = canvas.NewPNGImage(f)
-	if err != nil {
-		panic(fmt.Sprintf("couldn't read %v: %v", PreviousPath, err))
-	}
+	CacheDir = NewCache(dir, 2)
 }
 
 func main() {
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/churchill-meadows", handler(
+		"Churchill_Meadows", ChurchillMeadowsPoints, Churchill_Meadows))
+	http.HandleFunc("/irvine-creek",
+		handler("Irvine_Creek", IrvineCreekPoints, Irvine_Creek))
+
+	go CacheDir.ListenForUpdates()
 
 	l, err := net.Listen("tcp", ":13370")
 	if err != nil {
-		log.Fatalf("ERROR couldn't listen on port 13370: %v", err)
+		log.Fatalf("ERROR couldn't listen on port 13370: %v\n", err)
 	}
 	defer l.Close()
 
 	// Start the server
 	go func() {
-		log.Printf("INFO listening at /...")
-		log.Fatalf("ERROR http.Serve returned with: %v",
+		log.Printf("INFO listening at /...\n")
+		log.Fatalf("ERROR http.Serve returned with: %v\n",
 			http.Serve(l, nil))
 	}()
 
@@ -179,39 +301,45 @@ func convert(data [][]string) map[int]string {
 	return result
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodGet:
-		w.Header().Set("Content-Type", "image/png")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Cache-Control", "no-cache")
+func handler(name string, points []canvas.Point, input_bytes []byte) func(http.ResponseWriter, *http.Request) {
+	input, err := canvas.NewPNGImage(bytes.NewReader(input_bytes))
+	if err != nil {
+		log.Fatalf("failed to parse PNG image '%v': %v\n", name, err)
+	}
 
-		_, err := w.Write(Previous.Bytes)
-		if err != nil {
-			fmt.Printf("error: %v\n", err)
-			return
-		}
-	case http.MethodPost:
-		if r.Header.Get("X-I-Am-Silly") != "Yes I am" {
-			return
-		}
+	return func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			w.Header().Set("Content-Type", "image/png")
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Cache-Control", "no-cache")
 
-		buf, _ := io.ReadAll(r.Body)
-		data := make([][]string, 115)
-		err := json.Unmarshal(buf, &data)
-		if err != nil {
-			fmt.Printf("error: %v\n", err)
-			return
-		}
+			_, err := CacheDir.WriteImage(name, w)
+			if err != nil {
+				fmt.Printf("error: %v\n", err)
+				return
+			}
+		case http.MethodPost:
+			if r.Header.Get("X-I-Am-Silly") != "Yes I am" {
+				return
+			}
 
-		log.Printf("new connection from %v\n", r.RemoteAddr)
-		new_data := convert(data)
-		go generateImage(new_data)
-		w.WriteHeader(200)
+			buf, _ := io.ReadAll(r.Body)
+			data := [][]string{}
+			err := json.Unmarshal(buf, &data)
+			if err != nil {
+				fmt.Printf("error: %v\n", err)
+				return
+			}
+
+			log.Printf("new connection from %v\n", r.RemoteAddr)
+			new_data := convert(data)
+			go generateImage(name, points, new_data, input)
+		}
 	}
 }
 
-func generateImage(data map[int]string) {
+func generateImage(name string, points []canvas.Point, data map[int]string, input canvas.Image) {
 	red_style := canvas.Style{
 		Fill: canvas.Paint{
 			Color: canvas.Hex("#ff0000"),
@@ -222,13 +350,13 @@ func generateImage(data map[int]string) {
 			Color: canvas.Hex("#ffd900"),
 		},
 	}
-	c := canvas.New(float64(Image.Bounds().Dx()),
-		float64(Image.Bounds().Dy()))
-	c.RenderImage(Image.Image, canvas.Identity)
+	c := canvas.New(float64(input.Bounds().Dx()),
+		float64(input.Bounds().Dy()))
+	c.RenderImage(input.Image, canvas.Identity)
 	for k, v := range data {
-		point := Points[k]
+		point := points[k]
 		center := canvas.Identity.Translate(point.X,
-			float64(Image.Bounds().Dy())-point.Y)
+			float64(input.Bounds().Dy())-point.Y)
 		switch v {
 		case "SOLD":
 			c.RenderPath(canvas.Circle(7), red_style, center)
@@ -239,32 +367,14 @@ func generateImage(data map[int]string) {
 
 	result := rasterizer.Draw(c, canvas.DefaultResolution,
 		canvas.SRGBColorSpace{})
-	// Save the previous image
-	f, err := os.Create(PreviousPath)
-	if err != nil {
-		log.Printf("couldn't open file: %v\n", err)
-		return
-	}
-	defer func() {
-		err := f.Close()
-		if err != nil {
-			log.Printf("couldn't write file: %v\n", err)
-		}
-	}()
-
 	bbuf := &bytes.Buffer{}
-	err = png.Encode(io.MultiWriter(f, bbuf), result)
+	err := png.Encode(bbuf, result)
 	if err != nil {
 		log.Printf("couldn't encode image: %v\n", err)
 		// TODO: write error response here
 		return
 	}
 
-	Previous, err = canvas.NewPNGImage(bytes.NewReader(bbuf.Bytes()))
-	if err != nil {
-		log.Printf("couldn't encode image: %v\n", err)
-		// TODO: write error response here
-		return
-	}
+	CacheDir.Set(name, bbuf.Bytes())
 	log.Println("new thing should be ready")
 }
