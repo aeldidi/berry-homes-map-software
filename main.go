@@ -146,6 +146,10 @@ func NewCache(basepath string, buffer int) Cache {
 		log.Fatalf("couldn't read '%v': %v\n", basepath, err)
 	}
 
+	if len(dirs) == 0 {
+		log.Printf("cache is empty\n")
+	}
+
 	for _, dir := range dirs {
 		if dir.Type().IsDir() {
 			log.Printf("directory in cache dir: %v", dir.Name())
@@ -157,6 +161,7 @@ func NewCache(basepath string, buffer int) Cache {
 			log.Fatalf("couldn't read file '%v': %v\n", dir.Name(), err)
 		}
 
+		log.Printf("reading '%v' from cache\n", dir.Name())
 		name := strings.TrimSuffix(dir.Name(), ".png")
 		result.imgs[name] = buf
 	}
@@ -235,8 +240,8 @@ func init() {
 }
 
 func main() {
-	http.HandleFunc("/churchill-meadows", handler(
-		"Churchill_Meadows", ChurchillMeadowsPoints, Churchill_Meadows))
+	http.HandleFunc("/churchill-meadow", handler(
+		"Churchill_Meadow", ChurchillMeadowsPoints, Churchill_Meadows))
 	http.HandleFunc("/irvine-creek",
 		handler("Irvine_Creek", IrvineCreekPoints, Irvine_Creek))
 
