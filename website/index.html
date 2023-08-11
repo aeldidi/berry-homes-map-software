@@ -1,14 +1,308 @@
 <!DOCTYPE html>
 
 <head>
-        <title>Real Estate Map Demo</title>
+        <title>Berry Homes Map Thing</title>
 
         <style>
+                @import url('/Inter/inter.css');
+
+                html,
+                body {
+                        height: 100%;
+                        overflow: hidden;
+                        position: relative;
+                }
+
                 .hidden {
-                        display: none;
+                        display: none !important;
+                }
+
+                .content {
+                        width: 100%;
+                }
+
+                .dot {
+                        vertical-align: middle;
+                        display: inline-block;
+                        border-radius: 10px;
+                        border: 1px solid black;
+                        width: 10px;
+                        height: 10px;
+                }
+
+                #container {
+                        max-width: 1000px;
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: center;
+                        align-items: center;
+                }
+
+                * {
+                        font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        margin: 0;
+                        padding: 0;
+                }
+
+                p {
+                        font-size: 15.5px;
+                }
+
+                #big {
+                        font-size: 29px;
+                        font-weight: bold;
+                }
+
+                main {
+                        max-width: 100%;
+                        height: calc(100% - 104px);
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        flex-direction: column;
+                }
+
+                .active {
+                        border-bottom: 5px solid #0066ff
+                }
+
+                nav {
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                        justify-content: center;
+                }
+
+                header {
+                        padding-top: 10px;
+                        position: relative;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        background-color: #fff;
+
+                        height: 104px;
+
+                        border-bottom: 1px solid #0066ff;
+                        z-index: 5;
+                }
+
+                button {
+                        background: white;
+                        height: 50px;
+                        font-size: 20px;
+                        padding: 4px;
+                        border: none;
+                        border-bottom: 5px solid #00000000;
+                }
+
+                button:hover {
+                        background-color: #f0f0f0;
+                }
+
+                /* Loading spinner stuff */
+                .lds-ring {
+                        display: inline-block;
+                        position: relative;
+                        width: 80px;
+                        height: 80px;
+                }
+
+                .lds-ring div {
+                        box-sizing: border-box;
+                        display: block;
+                        position: absolute;
+                        width: 64px;
+                        height: 64px;
+                        margin: 8px;
+                        border: 8px solid #0066ff;
+                        border-radius: 50%;
+                        animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+                        border-color: #0066ff transparent transparent transparent;
+                }
+
+                .lds-ring div:nth-child(1) {
+                        animation-delay: -0.45s;
+                }
+
+                .lds-ring div:nth-child(2) {
+                        animation-delay: -0.3s;
+                }
+
+                .lds-ring div:nth-child(3) {
+                        animation-delay: -0.15s;
+                }
+
+                @keyframes lds-ring {
+                        0% {
+                                transform: rotate(0deg);
+                        }
+
+                        100% {
+                                transform: rotate(360deg);
+                        }
                 }
         </style>
 
+        <script>
+                // Helper functions
+                const $ = (selector) => document.querySelector(selector)
+                $.all = (selector) => [...document.querySelectorAll(selector)]
+                Element.prototype.html = function (list) {
+                        return this.replaceWith(html(list))
+                }
+                Element.prototype._append = Element.prototype.append
+                Element.prototype.append = function (...list) {
+                        for (i of list) {
+                                if (Array.isArray(i)) {
+                                        this.appendChild(html(i))
+                                        continue
+                                }
+
+                                this._append(i)
+                        }
+                }
+
+                // Generates an element tree from a lisp-like list.
+                // The first element of each nested list is the tag name.
+                // If any element is an object, it's the attributes.
+                // Otherwise, if any element is an array, its treated like
+                // another html list, and if its a string it's appended to
+                // innerHTML.
+                //
+                // For example, ['p', { classes: ['bar', 'foo'] }, ['b', 'a'],
+                //               'b&lt;']
+                // becomes <p class="bar foo"><b>a</b>b&lt;</p>
+                function html(list) {
+                        const result = document.createElement(list[0])
+                        if (list.length == 1) {
+                                return result
+                        }
+
+                        for (i of list.slice(1)) {
+                                if (Array.isArray(i) || (i instanceof Element ||
+                                        i instanceof HTMLElement)) {
+                                        result.append(i)
+                                        continue
+                                }
+
+                                if (typeof i !== 'object') {
+                                        result.append(document.createTextNode(i))
+                                        continue
+                                }
+
+                                for (attr of Object.keys(i)) {
+                                        // classList is read-only
+                                        if (attr === 'classes') {
+                                                result.classList.add(...i[attr])
+                                                continue
+                                        }
+
+                                        result[attr] = i[attr]
+                                }
+                                continue
+                        }
+                        return result
+                }
+
+
+                function hide() {
+                        $('.content').classList.add('hidden')
+                        $('#loading').classList.remove('hidden')
+                }
+
+                function show() {
+                        $('.content').classList.remove('hidden')
+                        $('#loading').classList.add('hidden')
+                }
+
+                let state = {
+                        // This could be 'churchill-meadow' or 'irvine-creek'
+                        value: null,
+
+                        set: async function (value) {
+                                if (this.value === value) {
+                                        return
+                                }
+
+                                // 1. set it to loading and start loading the
+                                //    thing.
+                                hide()
+                                let content = html(['img', {
+                                        classes: ['content'],
+                                        src: `https://berry-homes.eldidi.org/${value}`,
+                                }])
+                                content.style['max-width'] = '100%'
+
+                                function onZoom(e) {
+                                        const x = e.clientX - e.target.offsetLeft
+                                        const y = e.clientY - e.target.offsetTop
+                                        content.style.transformOrigin = `${x}px ${y}px`
+                                        content.style.transform = "scale(2.5)"
+                                }
+
+                                function offZoom(e) {
+                                        content.style.transformOrigin = `center center`
+                                        content.style.transform = null
+                                        content.style.width = '100%'
+                                }
+                                content.addEventListener("mousemove", onZoom)
+                                content.addEventListener("mouseover", onZoom)
+                                content.addEventListener("mouseleave", offZoom)
+
+                                // 2. when the thing is done loading, switch it
+                                //    out for the actual picture.
+                                content.onload = function () {
+                                        $('.content').replaceWith(content)
+                                        show()
+                                }
+                        }
+                }
+
+                window.onload = async function () {
+                        const container = $('#container')
+
+                        state.set('churchill-meadow')
+
+                        $('#churchill').addEventListener('click', async () => {
+                                state.set('churchill-meadow')
+                                $('#churchill').classList.add('active')
+                                $('#irvine').classList.remove('active')
+                        })
+
+                        $('#irvine').addEventListener('click', async () => {
+                                state.set('irvine-creek')
+                                $('#churchill').classList.remove('active')
+                                $('#irvine').classList.add('active')
+                        })
+
+                }
+        </script>
+
 <body>
-        <img src="https://test-sheet.eldidi.org/api" width="700" height="500" />
+        <header class=".center">
+                <p id="big">Berry Homes Sales Tracker</p>
+                <p>Hover over the image to zoom in, and click on the name of the area to refresh the map.
+                        <span class="dot" style="background-color: red"></span> = Sold,
+                        <span class="dot" style="background-color: yellow"></span> =
+                        Pending.
+                </p>
+                <nav>
+                        <button id="churchill" class="active">Churchill Meadow</button>
+                        <span style="width: 20px; text-align: center;">&#x2022;</span>
+                        <button id="irvine">Irvine Creek</button>
+                </nav>
+        </header>
+        <main>
+                <div id="loading" class="lds-ring">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                </div>
+                <div id="container">
+                        <img class="hidden content" />
+                </div>
+        </main>
 </body>
