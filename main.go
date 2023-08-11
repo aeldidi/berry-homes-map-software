@@ -176,7 +176,7 @@ func (c *Cache) WriteImage(name string, w io.Writer) (int, error) {
 func (c *Cache) ListenForUpdates() {
 	for {
 		entry := <-c.c
-		path := path.Join(c.path, fmt.Sprintf(entry.name, ".png"))
+		path := path.Join(c.path, fmt.Sprintf("%v%v", entry.name, ".png"))
 		f, err := os.Create(path)
 		if err != nil {
 			log.Printf("couldn't write '%v' to cache: %v", entry.name, err)
