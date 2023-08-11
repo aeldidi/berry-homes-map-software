@@ -316,6 +316,7 @@ func handler(name string, points []canvas.Point, input_bytes []byte, status_colu
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("%v: request: %#v", name, r)
 		switch r.Method {
 		case http.MethodGet:
 			w.Header().Set("Content-Type", "image/png")
