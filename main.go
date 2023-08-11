@@ -340,7 +340,7 @@ func handler(name string, points []canvas.Point, input_bytes []byte, status_colu
 				return
 			}
 
-			log.Printf("new connection from %v\n", r.RemoteAddr)
+			log.Printf("%v: new connection from %v\n", name, r.RemoteAddr)
 			new_data := convert(data, status_column)
 			go generateImage(name, points, new_data, input)
 		}
