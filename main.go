@@ -135,10 +135,13 @@ func NewCache(basepath string, buffer int) Cache {
 	result := Cache{
 		path: basepath,
 		imgs: make(map[string][]byte, buffer),
-		c: make(chan struct {
-			name  string
-			bytes []byte
-		}, buffer),
+		c: make(
+			chan struct {
+				name  string
+				bytes []byte
+			},
+			buffer,
+		),
 	}
 
 	dirs, err := os.ReadDir(result.path)
@@ -241,9 +244,9 @@ func init() {
 
 func main() {
 	http.HandleFunc("/churchill-meadow", handler(
-		"Churchill_Meadow", ChurchillMeadowsPoints, Churchill_Meadows))
+		"Churchill_Meadow", ChurchillMeadowsPoints, Churchill_Meadows, 5))
 	http.HandleFunc("/irvine-creek",
-		handler("Irvine_Creek", IrvineCreekPoints, Irvine_Creek))
+		handler("Irvine_Creek", IrvineCreekPoints, Irvine_Creek, 6))
 
 	go CacheDir.ListenForUpdates()
 
@@ -267,7 +270,7 @@ func main() {
 	log.Printf("INFO caught signal %s: shutting down.", sig)
 }
 
-func convert(data [][]string) map[int]string {
+func convert(data [][]string, status_column int) map[int]string {
 	fixed_data := make([]SheetData, 0)
 	for _, thing := range data {
 		lot, _ := strconv.Atoi(thing[0])
@@ -276,7 +279,7 @@ func convert(data [][]string) map[int]string {
 		sdata := SheetData{
 			Lot:    lot,
 			Block:  block,
-			Status: thing[5],
+			Status: thing[status_column],
 		}
 
 		if sdata.Status != "SOLD" && sdata.Status != "PENDING" {
@@ -306,7 +309,7 @@ func convert(data [][]string) map[int]string {
 	return result
 }
 
-func handler(name string, points []canvas.Point, input_bytes []byte) func(http.ResponseWriter, *http.Request) {
+func handler(name string, points []canvas.Point, input_bytes []byte, status_column int) func(http.ResponseWriter, *http.Request) {
 	input, err := canvas.NewPNGImage(bytes.NewReader(input_bytes))
 	if err != nil {
 		log.Fatalf("failed to parse PNG image '%v': %v\n", name, err)
@@ -338,7 +341,7 @@ func handler(name string, points []canvas.Point, input_bytes []byte) func(http.R
 			}
 
 			log.Printf("new connection from %v\n", r.RemoteAddr)
-			new_data := convert(data)
+			new_data := convert(data, status_column)
 			go generateImage(name, points, new_data, input)
 		}
 	}
