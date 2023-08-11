@@ -324,7 +324,7 @@ func handler(name string, points []canvas.Point, input_bytes []byte, status_colu
 
 			_, err := CacheDir.WriteImage(name, w)
 			if err != nil {
-				fmt.Printf("error: %v\n", err)
+				log.Printf("error: %v\n", err)
 				return
 			}
 		case http.MethodPost:
