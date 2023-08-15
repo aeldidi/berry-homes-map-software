@@ -309,7 +309,12 @@ func convert(data [][]string, status_column int) map[int]string {
 	return result
 }
 
-func handler(name string, points []canvas.Point, input_bytes []byte, status_column int) func(http.ResponseWriter, *http.Request) {
+func handler(
+	name string,
+	points []canvas.Point,
+	input_bytes []byte,
+	status_column int,
+) func(http.ResponseWriter, *http.Request) {
 	input, err := canvas.NewPNGImage(bytes.NewReader(input_bytes))
 	if err != nil {
 		log.Fatalf("failed to parse PNG image '%v': %v\n", name, err)
@@ -340,14 +345,20 @@ func handler(name string, points []canvas.Point, input_bytes []byte, status_colu
 				return
 			}
 
-			log.Printf("%v: new connection from %v\n", name, r.RemoteAddr)
+			log.Printf("%v: new connection from %v\n", name,
+				r.RemoteAddr)
 			new_data := convert(data, status_column)
 			go generateImage(name, points, new_data, input)
 		}
 	}
 }
 
-func generateImage(name string, points []canvas.Point, data map[int]string, input canvas.Image) {
+func generateImage(
+	name string,
+	points []canvas.Point,
+	data map[int]string,
+	input canvas.Image,
+) {
 	red_style := canvas.Style{
 		Fill: canvas.Paint{
 			Color: canvas.Hex("#ff0000"),
@@ -356,6 +367,11 @@ func generateImage(name string, points []canvas.Point, data map[int]string, inpu
 	yellow_style := canvas.Style{
 		Fill: canvas.Paint{
 			Color: canvas.Hex("#ffd900"),
+		},
+	}
+	green_style := canvas.Style{
+		Fill: canvas.Paint{
+			Color: canvas.Hex("#42f566"),
 		},
 	}
 	c := canvas.New(float64(input.Bounds().Dx()),
@@ -370,6 +386,8 @@ func generateImage(name string, points []canvas.Point, data map[int]string, inpu
 			c.RenderPath(canvas.Circle(7), red_style, center)
 		case "PENDING":
 			c.RenderPath(canvas.Circle(7), yellow_style, center)
+		case "ON HOLD":
+			c.RenderPath(canvas.Circle(7), green_style, center)
 		}
 	}
 
