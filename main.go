@@ -282,7 +282,9 @@ func convert(data [][]string, status_column int) map[int]string {
 			Status: thing[status_column],
 		}
 
-		if sdata.Status != "SOLD" && sdata.Status != "PENDING" {
+		if sdata.Status != "SOLD" &&
+			sdata.Status != "PENDING" &&
+			sdata.Status != "ON HOLD" {
 			sdata.Status = ""
 		}
 
