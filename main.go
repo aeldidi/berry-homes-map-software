@@ -250,16 +250,20 @@ func convert(data [][]string, status_column int) map[int]string {
 		block, _ := strconv.Atoi(thing[1])
 
 		sdata := SheetData{
-			Lot:    lot,
-			Block:  block,
-			Status: thing[status_column],
+			Lot:   lot,
+			Block: block,
 		}
 
-		if !strings.Contains(sdata.Status, "SOLD") &&
-			!strings.Contains(sdata.Status, "PENDING") &&
-			!strings.Contains(sdata.Status, "CLOSED") &&
-			!strings.Contains(sdata.Status, "ON HOLD") {
-			sdata.Status = ""
+		d := thing[status_column]
+
+		if strings.Contains(d, "SOLD") {
+			sdata.Status = "SOLD"
+		} else if strings.Contains(d, "PENDING") {
+			sdata.Status = "PENDING"
+		} else if strings.Contains(d, "CLOSED") {
+			sdata.Status = "CLOSED"
+		} else if strings.Contains(d, "ON HOLD") {
+			sdata.Status = "ON HOLD"
 		}
 
 		fixed_data = append(fixed_data, sdata)
