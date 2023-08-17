@@ -362,10 +362,6 @@ func generateImage(
 		center := canvas.Identity.Translate(point.X,
 			float64(input.Bounds().Dy())-point.Y)
 
-		if v != "" {
-			log.Printf("%v: %v\n", k, v)
-		}
-
 		switch v {
 		case "SOLD":
 			c.RenderPath(canvas.Circle(7), red_style, center)
