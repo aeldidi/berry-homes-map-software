@@ -255,9 +255,10 @@ func convert(data [][]string, status_column int) map[int]string {
 			Status: thing[status_column],
 		}
 
-		if sdata.Status != "SOLD" &&
-			sdata.Status != "PENDING" &&
-			sdata.Status != "ON HOLD" {
+		if strings.Contains(sdata.Status, "SOLD") &&
+			strings.Contains(sdata.Status, "PENDING") &&
+			strings.Contains(sdata.Status, "CLOSED") &&
+			strings.Contains(sdata.Status, "ON HOLD") {
 			sdata.Status = ""
 		}
 
@@ -353,26 +354,18 @@ func generateImage(
 		float64(input.Bounds().Dy()))
 	c.RenderImage(input.Image, canvas.Identity)
 	for k, v := range data {
-		v := strings.ToLower(v)
 		point := points[k]
 		center := canvas.Identity.Translate(point.X,
 			float64(input.Bounds().Dy())-point.Y)
-		if name == "Irvine_Creek" {
-			log.Printf("%v: %v\n", k, v)
-		}
-		if strings.Contains(v, "sold") || strings.Contains(v, "closed") {
+		switch v {
+		case "SOLD":
 			c.RenderPath(canvas.Circle(7), red_style, center)
-			continue
-		}
-
-		if strings.Contains(v, "pending") {
+		case "CLOSED":
+			c.RenderPath(canvas.Circle(7), red_style, center)
+		case "PENDING":
 			c.RenderPath(canvas.Circle(7), yellow_style, center)
-			continue
-		}
-
-		if strings.Contains(v, "on hold") {
+		case "ON HOLD":
 			c.RenderPath(canvas.Circle(7), green_style, center)
-			continue
 		}
 	}
 
