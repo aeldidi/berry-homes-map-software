@@ -255,10 +255,10 @@ func convert(data [][]string, status_column int) map[int]string {
 			Status: thing[status_column],
 		}
 
-		if strings.Contains(sdata.Status, "SOLD") &&
-			strings.Contains(sdata.Status, "PENDING") &&
-			strings.Contains(sdata.Status, "CLOSED") &&
-			strings.Contains(sdata.Status, "ON HOLD") {
+		if !strings.Contains(sdata.Status, "SOLD") &&
+			!strings.Contains(sdata.Status, "PENDING") &&
+			!strings.Contains(sdata.Status, "CLOSED") &&
+			!strings.Contains(sdata.Status, "ON HOLD") {
 			sdata.Status = ""
 		}
 
