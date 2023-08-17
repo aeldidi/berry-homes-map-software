@@ -384,5 +384,5 @@ func generateImage(
 	}
 
 	CacheDir.Set(name, bbuf.Bytes())
-	log.Println("new thing should be ready")
+	log.Printf("%v: new thing should be ready", name)
 }
