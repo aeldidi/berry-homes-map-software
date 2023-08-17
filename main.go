@@ -353,20 +353,21 @@ func generateImage(
 		float64(input.Bounds().Dy()))
 	c.RenderImage(input.Image, canvas.Identity)
 	for k, v := range data {
+		v := strings.ToLower(v)
 		point := points[k]
 		center := canvas.Identity.Translate(point.X,
 			float64(input.Bounds().Dy())-point.Y)
-		if strings.Contains(v, "SOLD") || strings.Contains(v, "CLOSED") {
+		if strings.Contains(v, "sold") || strings.Contains(v, "closed") {
 			c.RenderPath(canvas.Circle(7), red_style, center)
 			continue
 		}
 
-		if strings.Contains(v, "PENDING") {
+		if strings.Contains(v, "pending") {
 			c.RenderPath(canvas.Circle(7), yellow_style, center)
 			continue
 		}
 
-		if strings.Contains(v, "ON HOLD") {
+		if strings.Contains(v, "on hold") {
 			c.RenderPath(canvas.Circle(7), green_style, center)
 			continue
 		}
