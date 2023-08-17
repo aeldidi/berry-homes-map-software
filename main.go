@@ -357,6 +357,9 @@ func generateImage(
 		point := points[k]
 		center := canvas.Identity.Translate(point.X,
 			float64(input.Bounds().Dy())-point.Y)
+		if name == "Irvine_Creek" {
+			log.Printf("%v\n", v)
+		}
 		if strings.Contains(v, "sold") || strings.Contains(v, "closed") {
 			c.RenderPath(canvas.Circle(7), red_style, center)
 			continue
