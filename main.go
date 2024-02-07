@@ -380,19 +380,24 @@ func generateImage(
 		center := canvas.Identity.Translate(point.X,
 			float64(input.Bounds().Dy())-point.Y)
 
-		c.RenderPath(canvas.Circle(8), color("#000000"), center)
 		switch v {
 		case "SOLD":
+			c.RenderPath(canvas.Circle(8), color("#000000"), center)
 			c.RenderPath(canvas.Circle(7), red_style, center)
 		case "CLOSED":
+			c.RenderPath(canvas.Circle(8), color("#000000"), center)
 			c.RenderPath(canvas.Circle(7), red_style, center)
 		case "PENDING":
+			c.RenderPath(canvas.Circle(8), color("#000000"), center)
 			c.RenderPath(canvas.Circle(7), yellow_style, center)
 		case "ON HOLD":
+			c.RenderPath(canvas.Circle(8), color("#000000"), center)
 			c.RenderPath(canvas.Circle(7), green_style, center)
 		case "SPEC":
+			c.RenderPath(canvas.Circle(8), color("#000000"), center)
 			c.RenderPath(canvas.Circle(7), white_style, center)
 		case "SHOWHOME":
+			c.RenderPath(canvas.Circle(8), color("#000000"), center)
 			c.RenderPath(canvas.Circle(7), blue_style, center)
 		}
 	}
