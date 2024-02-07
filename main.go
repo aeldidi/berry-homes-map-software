@@ -32,13 +32,33 @@ type SheetData struct {
 
 var IrvineCreekPoints = []canvas.Point{
 	// Block 3
-	{X: 321, Y: 589}, {X: 334, Y: 566}, {X: 373, Y: 533}, {X: 383, Y: 550}, {X: 393, Y: 566}, {X: 402, Y: 581}, {X: 411, Y: 597}, {X: 418, Y: 611}, {X: 429, Y: 627},
+	{X: 321, Y: 589}, {X: 334, Y: 566}, {X: 373, Y: 533}, {X: 383, Y: 550},
+	{X: 393, Y: 566}, {X: 402, Y: 581}, {X: 411, Y: 597}, {X: 418, Y: 611},
+	{X: 429, Y: 627},
 
 	// Block 4
-	{X: 503, Y: 660}, {X: 521, Y: 647}, {X: 534, Y: 636}, {X: 549, Y: 628}, {X: 564, Y: 619}, {X: 581, Y: 609}, {X: 594, Y: 599}, {X: 609, Y: 592}, {X: 629, Y: 585}, {X: 641, Y: 572}, {X: 657, Y: 565}, {X: 698, Y: 541}, {X: 706, Y: 557}, {X: 718, Y: 572}, {X: 726, Y: 585}, {X: 743, Y: 589}, {X: 762, Y: 590}, {X: 779, Y: 590}, {X: 795, Y: 581}, {X: 800, Y: 560}, {X: 800, Y: 542}, {X: 798, Y: 522}, {X: 794, Y: 505}, {X: 786, Y: 488},
+	{X: 503, Y: 660}, {X: 521, Y: 647}, {X: 534, Y: 636}, {X: 549, Y: 628},
+	{X: 564, Y: 619}, {X: 581, Y: 609}, {X: 594, Y: 599}, {X: 609, Y: 592},
+	{X: 629, Y: 585}, {X: 641, Y: 572}, {X: 657, Y: 565}, {X: 698, Y: 541},
+	{X: 706, Y: 557}, {X: 718, Y: 572}, {X: 726, Y: 585}, {X: 743, Y: 589},
+	{X: 762, Y: 590}, {X: 779, Y: 590}, {X: 795, Y: 581}, {X: 800, Y: 560},
+	{X: 800, Y: 542}, {X: 798, Y: 522}, {X: 794, Y: 505}, {X: 786, Y: 488},
 
 	// Block 7
-	{X: 717, Y: 470}, {X: 707, Y: 455}, {X: 699, Y: 439}, {X: 691, Y: 421}, {X: 731, Y: 400}, {X: 758, Y: 407}, {X: 778, Y: 406}, {X: 793, Y: 397}, {X: 798, Y: 380}, {X: 796, Y: 363}, {X: 789, Y: 346}, {X: 773, Y: 338}, {X: 756, Y: 336}, {X: 738, Y: 340}, {X: 723, Y: 345}, {X: 701, Y: 354}, {X: 675, Y: 369}, {X: 654, Y: 381}, {X: 634, Y: 395}, {X: 627, Y: 417}, {X: 630, Y: 438}, {X: 640, Y: 451}, {X: 651, Y: 468}, {X: 660, Y: 483}, {X: 668, Y: 497}, {X: 597, Y: 542}, {X: 585, Y: 525}, {X: 573, Y: 511}, {X: 570, Y: 492}, {X: 559, Y: 471}, {X: 543, Y: 471}, {X: 522, Y: 475}, {X: 508, Y: 490}, {X: 505, Y: 513}, {X: 509, Y: 529}, {X: 523, Y: 545}, {X: 534, Y: 557}, {X: 543, Y: 570}, {X: 477, Y: 611}, {X: 466, Y: 594}, {X: 459, Y: 579}, {X: 451, Y: 564}, {X: 441, Y: 550}, {X: 431, Y: 534}, {X: 423, Y: 519}, {X: 416, Y: 502}, {X: 399, Y: 476}, {X: 380, Y: 471}, {X: 359, Y: 467}, {X: 336, Y: 469}, {X: 321, Y: 487}, {X: 317, Y: 504}, {X: 303, Y: 528}, {X: 290, Y: 547}, {X: 280, Y: 566},
+	{X: 717, Y: 470}, {X: 707, Y: 455}, {X: 699, Y: 439}, {X: 691, Y: 421},
+	{X: 731, Y: 400}, {X: 758, Y: 407}, {X: 778, Y: 406}, {X: 793, Y: 397},
+	{X: 798, Y: 380}, {X: 796, Y: 363}, {X: 789, Y: 346}, {X: 773, Y: 338},
+	{X: 756, Y: 336}, {X: 738, Y: 340}, {X: 723, Y: 345}, {X: 701, Y: 354},
+	{X: 675, Y: 369}, {X: 654, Y: 381}, {X: 634, Y: 395}, {X: 627, Y: 417},
+	{X: 630, Y: 438}, {X: 640, Y: 451}, {X: 651, Y: 468}, {X: 660, Y: 483},
+	{X: 668, Y: 497}, {X: 597, Y: 542}, {X: 585, Y: 525}, {X: 573, Y: 511},
+	{X: 570, Y: 492}, {X: 559, Y: 471}, {X: 543, Y: 471}, {X: 522, Y: 475},
+	{X: 508, Y: 490}, {X: 505, Y: 513}, {X: 509, Y: 529}, {X: 523, Y: 545},
+	{X: 534, Y: 557}, {X: 543, Y: 570}, {X: 477, Y: 611}, {X: 466, Y: 594},
+	{X: 459, Y: 579}, {X: 451, Y: 564}, {X: 441, Y: 550}, {X: 431, Y: 534},
+	{X: 423, Y: 519}, {X: 416, Y: 502}, {X: 399, Y: 476}, {X: 380, Y: 471},
+	{X: 359, Y: 467}, {X: 336, Y: 469}, {X: 321, Y: 487}, {X: 317, Y: 504},
+	{X: 303, Y: 528}, {X: 290, Y: 547}, {X: 280, Y: 566},
 }
 
 // There are 112 numbers
@@ -254,16 +274,20 @@ func convert(data [][]string, status_column int) map[int]string {
 			Block: block,
 		}
 
-		d := thing[status_column]
+		d := strings.ToLower(thing[status_column])
 
-		if strings.Contains(d, "SOLD") {
+		if strings.Contains(d, "sold") {
 			sdata.Status = "SOLD"
-		} else if strings.Contains(d, "PENDING") {
+		} else if strings.Contains(d, "pending") {
 			sdata.Status = "PENDING"
-		} else if strings.Contains(d, "CLOSED") {
+		} else if strings.Contains(d, "closed") {
 			sdata.Status = "CLOSED"
-		} else if strings.Contains(d, "ON HOLD") {
+		} else if strings.Contains(d, "on hold") {
 			sdata.Status = "ON HOLD"
+		} else if strings.Contains(d, "spec") {
+			sdata.Status = "SPEC"
+		} else if strings.Contains(d, "showhome") {
+			sdata.Status = "SHOWHOME"
 		}
 
 		fixed_data = append(fixed_data, sdata)
@@ -333,27 +357,21 @@ func handler(
 	}
 }
 
+func color(color string) canvas.Style {
+	return canvas.Style{Fill: canvas.Paint{Color: canvas.Hex(color)}}
+}
+
 func generateImage(
 	name string,
 	points []canvas.Point,
 	data map[int]string,
 	input canvas.Image,
 ) {
-	red_style := canvas.Style{
-		Fill: canvas.Paint{
-			Color: canvas.Hex("#ff0000"),
-		},
-	}
-	yellow_style := canvas.Style{
-		Fill: canvas.Paint{
-			Color: canvas.Hex("#ffd900"),
-		},
-	}
-	green_style := canvas.Style{
-		Fill: canvas.Paint{
-			Color: canvas.Hex("#42f566"),
-		},
-	}
+	red_style := color("#ff0000")
+	yellow_style := color("#ffd900")
+	green_style := color("#42f566")
+	white_style := color("#ffffff")
+	blue_style := color("#03a1fc")
 	c := canvas.New(float64(input.Bounds().Dx()),
 		float64(input.Bounds().Dy()))
 	c.RenderImage(input.Image, canvas.Identity)
@@ -371,6 +389,10 @@ func generateImage(
 			c.RenderPath(canvas.Circle(7), yellow_style, center)
 		case "ON HOLD":
 			c.RenderPath(canvas.Circle(7), green_style, center)
+		case "SPEC":
+			c.RenderPath(canvas.Circle(7), white_style, center)
+		case "SHOWHOME":
+			c.RenderPath(canvas.Circle(7), blue_style, center)
 		}
 	}
 
