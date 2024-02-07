@@ -273,7 +273,7 @@ func convert(data [][]string, status_column int) map[int]string {
 			Lot:   lot,
 			Block: block,
 		}
-		log.Printf("status: %v", thing[status_column])
+
 		d := strings.ToLower(thing[status_column])
 
 		if strings.Contains(d, "sold") {
@@ -286,10 +286,8 @@ func convert(data [][]string, status_column int) map[int]string {
 			sdata.Status = "ON HOLD"
 		} else if strings.Contains(d, "spec") {
 			sdata.Status = "SPEC"
-			log.Printf("spec")
 		} else if strings.Contains(d, "showhome") {
 			sdata.Status = "SHOWHOME"
-			log.Printf("showhome")
 		}
 
 		fixed_data = append(fixed_data, sdata)
