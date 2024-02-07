@@ -273,7 +273,7 @@ func convert(data [][]string, status_column int) map[int]string {
 			Lot:   lot,
 			Block: block,
 		}
-
+		log.Printf("status: %v", thing[status_column])
 		d := strings.ToLower(thing[status_column])
 
 		if strings.Contains(d, "sold") {
