@@ -267,6 +267,8 @@ const (
 	SOLD = iota
 	PENDING
 	CLOSED
+	// Deprecated: BH Inventory is this now, but I'm not sure if they still
+	// use it internally or not so it stays for now.
 	ON_HOLD
 	SPEC
 	SHOWHOME
@@ -295,6 +297,8 @@ func status(area string, thing []string, status_column int) int {
 		strings.ToLower(thing[status_column+1]),
 		strings.ToLower("bh inventory"),
 	) {
+		status = BH_INVENTORY
+	} else if area == "Irvine_Creek" && strings.Contains(d, "closed bh") {
 		status = BH_INVENTORY
 	}
 
