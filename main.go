@@ -264,7 +264,8 @@ func main() {
 }
 
 const (
-	SOLD = iota
+	NOTHING = iota
+	SOLD
 	PENDING
 	CLOSED
 	// Deprecated: BH Inventory is this now, but I'm not sure if they still
@@ -306,6 +307,16 @@ func status(area string, thing []string, status_column int) int {
 }
 
 func convert(area string, data [][]string, status_column int) map[int]int {
+	jdata, err := json.Marshal(data)
+	if err != nil {
+		log.Printf("couldn't convert data for '%v' to JSON", area)
+	}
+	// 0644 - I can read/write, everyone else can only read.
+	err = os.WriteFile(path.Join(CacheDir.path, area+".json"), jdata, 0644)
+	if err != nil {
+		log.Printf("couldn't save data for '%v' as JSON", area)
+	}
+
 	fixed_data := make([]SheetData, 0)
 	for _, thing := range data {
 		lot, _ := strconv.Atoi(thing[0])
