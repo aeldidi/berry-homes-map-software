@@ -291,11 +291,8 @@ func status(area string, thing []string, status_column int) int {
 		status = SHOWHOME
 	}
 
-	log.Println(area)
-	if area == "Churchill_Meadow" {
-		if strings.Contains(thing[status_column], strings.ToLower("bh inventory")) {
-			status = BH_INVENTORY
-		}
+	if area == "Churchill_Meadow" && strings.Contains(thing[status_column+1], strings.ToLower("bh inventory")) {
+		status = BH_INVENTORY
 	}
 
 	return status
