@@ -27,7 +27,7 @@ import (
 type SheetData struct {
 	Lot    int
 	Block  int
-	Status string
+	Status int
 }
 
 var IrvineCreekPoints = []canvas.Point{
@@ -263,34 +263,54 @@ func main() {
 	log.Printf("INFO caught signal %s: shutting down.", sig)
 }
 
-func convert(data [][]string, status_column int) map[int]string {
+const (
+	SOLD = iota
+	PENDING
+	CLOSED
+	ON_HOLD
+	SPEC
+	SHOWHOME
+	BH_INVENTORY
+)
+
+func status(area string, thing []string, status_column int) int {
+	var status int
+	d := strings.ToLower(thing[status_column])
+
+	if strings.Contains(d, "sold") {
+		status = SOLD
+	} else if strings.Contains(d, "pending") {
+		status = PENDING
+	} else if strings.Contains(d, "closed") {
+		status = CLOSED
+	} else if strings.Contains(d, "on hold") {
+		status = ON_HOLD
+	} else if strings.Contains(d, "spec") {
+		status = SPEC
+	} else if strings.Contains(d, "showhome") {
+		status = SHOWHOME
+	}
+
+	if area == "churchill meadow" {
+		if strings.Contains(thing[status_column], strings.ToLower("bh inventory")) {
+			status = BH_INVENTORY
+		}
+	}
+
+	return status
+}
+
+func convert(area string, data [][]string, status_column int) map[int]int {
 	fixed_data := make([]SheetData, 0)
 	for _, thing := range data {
 		lot, _ := strconv.Atoi(thing[0])
 		block, _ := strconv.Atoi(thing[1])
 
-		sdata := SheetData{
-			Lot:   lot,
-			Block: block,
-		}
-
-		d := strings.ToLower(thing[status_column])
-
-		if strings.Contains(d, "sold") {
-			sdata.Status = "SOLD"
-		} else if strings.Contains(d, "pending") {
-			sdata.Status = "PENDING"
-		} else if strings.Contains(d, "closed") {
-			sdata.Status = "CLOSED"
-		} else if strings.Contains(d, "on hold") {
-			sdata.Status = "ON HOLD"
-		} else if strings.Contains(d, "spec") {
-			sdata.Status = "SPEC"
-		} else if strings.Contains(d, "showhome") {
-			sdata.Status = "SHOWHOME"
-		}
-
-		fixed_data = append(fixed_data, sdata)
+		fixed_data = append(fixed_data, SheetData{
+			Lot:    lot,
+			Block:  block,
+			Status: status(area, thing, status_column),
+		})
 	}
 
 	sort.Slice(fixed_data, func(i, j int) bool {
@@ -305,7 +325,7 @@ func convert(data [][]string, status_column int) map[int]string {
 		return a.Block < b.Block
 	})
 
-	result := make(map[int]string, len(fixed_data))
+	result := make(map[int]int, len(fixed_data))
 	for i := 0; i < len(fixed_data); i += 1 {
 		result[i] = fixed_data[i].Status
 	}
@@ -351,7 +371,7 @@ func handler(
 
 			log.Printf("%v: new connection from %v\n", name,
 				r.RemoteAddr)
-			new_data := convert(data, status_column)
+			new_data := convert(name, data, status_column)
 			go generateImage(name, points, new_data, input)
 		}
 	}
@@ -364,7 +384,7 @@ func color(color string) canvas.Style {
 func generateImage(
 	name string,
 	points []canvas.Point,
-	data map[int]string,
+	data map[int]int,
 	input canvas.Image,
 ) {
 	red_style := color("#ff0000")
@@ -381,22 +401,23 @@ func generateImage(
 			float64(input.Bounds().Dy())-point.Y)
 
 		switch v {
-		case "SOLD":
+		case SOLD:
 			c.RenderPath(canvas.Circle(8), color("#000000"), center)
 			c.RenderPath(canvas.Circle(7), red_style, center)
-		case "CLOSED":
+		case CLOSED:
 			c.RenderPath(canvas.Circle(8), color("#000000"), center)
 			c.RenderPath(canvas.Circle(7), red_style, center)
-		case "PENDING":
+		case PENDING:
 			c.RenderPath(canvas.Circle(8), color("#000000"), center)
 			c.RenderPath(canvas.Circle(7), yellow_style, center)
-		case "ON HOLD":
+		case ON_HOLD:
+		case BH_INVENTORY:
 			c.RenderPath(canvas.Circle(8), color("#000000"), center)
 			c.RenderPath(canvas.Circle(7), green_style, center)
-		case "SPEC":
+		case SPEC:
 			c.RenderPath(canvas.Circle(8), color("#000000"), center)
 			c.RenderPath(canvas.Circle(7), white_style, center)
-		case "SHOWHOME":
+		case SHOWHOME:
 			c.RenderPath(canvas.Circle(8), color("#000000"), center)
 			c.RenderPath(canvas.Circle(7), blue_style, center)
 		}
