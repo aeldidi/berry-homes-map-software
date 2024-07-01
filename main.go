@@ -274,7 +274,7 @@ const (
 	SPEC
 	SHOWHOME
 	BH_INVENTORY
-	AVAILIBLE
+	AVAILABLE
 )
 
 func status(area string, thing []string, status_column int) int {
@@ -293,8 +293,8 @@ func status(area string, thing []string, status_column int) int {
 		status = SPEC
 	} else if strings.Contains(d, "showhome") {
 		status = SHOWHOME
-	} else if strings.Contains(d, "availible") {
-		status = AVAILIBLE
+	} else if strings.Contains(d, "available") {
+		status = AVAILABLE
 	}
 
 	if area == "Churchill_Meadow" && strings.Contains(
