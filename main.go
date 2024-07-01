@@ -274,6 +274,7 @@ const (
 	SPEC
 	SHOWHOME
 	BH_INVENTORY
+	AVAILIBLE
 )
 
 func status(area string, thing []string, status_column int) int {
@@ -292,6 +293,8 @@ func status(area string, thing []string, status_column int) int {
 		status = SPEC
 	} else if strings.Contains(d, "showhome") {
 		status = SHOWHOME
+	} else if strings.Contains(d, "availible") {
+		status = AVAILIBLE
 	}
 
 	if area == "Churchill_Meadow" && strings.Contains(
@@ -408,6 +411,7 @@ func generateImage(
 	green_style := color("#42f566")
 	white_style := color("#ffffff")
 	blue_style := color("#03a1fc")
+	black_style := color("#000000")
 	c := canvas.New(float64(input.Bounds().Dx()),
 		float64(input.Bounds().Dy()))
 	c.RenderImage(input.Image, canvas.Identity)
@@ -417,6 +421,9 @@ func generateImage(
 			float64(input.Bounds().Dy())-point.Y)
 
 		switch v {
+		case AVAILIBLE:
+			c.RenderPath(canvas.Circle(8), color("#000000"), center)
+			c.RenderPath(canvas.Circle(7), green_style, center)
 		case SOLD:
 			c.RenderPath(canvas.Circle(8), color("#000000"), center)
 			c.RenderPath(canvas.Circle(7), red_style, center)
@@ -429,7 +436,7 @@ func generateImage(
 		case ON_HOLD:
 		case BH_INVENTORY:
 			c.RenderPath(canvas.Circle(8), color("#000000"), center)
-			c.RenderPath(canvas.Circle(7), green_style, center)
+			c.RenderPath(canvas.Circle(7), black_style, center)
 		case SPEC:
 			c.RenderPath(canvas.Circle(8), color("#000000"), center)
 			c.RenderPath(canvas.Circle(7), white_style, center)
