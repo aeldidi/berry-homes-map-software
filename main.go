@@ -421,7 +421,7 @@ func generateImage(
 			float64(input.Bounds().Dy())-point.Y)
 
 		switch v {
-		case AVAILIBLE:
+		case AVAILABLE:
 			c.RenderPath(canvas.Circle(8), color("#000000"), center)
 			c.RenderPath(canvas.Circle(7), green_style, center)
 		case SOLD:
