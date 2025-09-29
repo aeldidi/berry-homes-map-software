@@ -364,6 +364,7 @@ func handler(
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("access on %v\n", name)
 		switch r.Method {
 		case http.MethodGet:
 			w.Header().Set("Content-Type", "image/png")
